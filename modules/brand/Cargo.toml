@@ -1,0 +1,11 @@
+[package]
+name = "ccodex-brand"
+description = "Product identity constants and path helpers for ccodex"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dirs.workspace = true

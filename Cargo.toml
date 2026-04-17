@@ -1,0 +1,56 @@
+[workspace]
+resolver = "2"
+members = [
+    "apps/cli",
+    "apps/tui",
+    "apps/local-server",
+    "modules/brand",
+    "modules/protocol",
+    "modules/kernel",
+    "modules/runtime",
+    "modules/extensions",
+    "modules/compat",
+    "modules/store",
+    "modules/testkit",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MIT"
+repository = "https://github.com/universea/ccodex"
+
+[workspace.dependencies]
+anyhow = "1"
+async-trait = "0.1"
+clap = { version = "4", features = ["derive", "env"] }
+crossterm = "0.28"
+dirs = "6"
+futures = "0.3"
+pretty_assertions = "1"
+ratatui = "0.29"
+rusqlite = { version = "0.32", features = ["bundled", "time"] }
+schemars = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+time = { version = "0.3", features = ["formatting", "macros", "parsing", "serde"] }
+tokio = { version = "1", features = ["full"] }
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+thiserror = "2"
+ulid = { version = "1", features = ["serde"] }
+
+ccodex-brand = { path = "modules/brand" }
+ccodex-protocol = { path = "modules/protocol" }
+ccodex-kernel = { path = "modules/kernel" }
+ccodex-runtime = { path = "modules/runtime" }
+ccodex-extensions = { path = "modules/extensions" }
+ccodex-compat = { path = "modules/compat" }
+ccodex-store = { path = "modules/store" }
+ccodex-testkit = { path = "modules/testkit" }
+
+[profile.release]
+lto = "thin"
+strip = true

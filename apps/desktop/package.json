@@ -1,0 +1,10 @@
+{
+  "name": "ccodex-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "echo \"desktop shell not implemented yet\"",
+    "build": "echo \"desktop shell not implemented yet\""
+  }
+}

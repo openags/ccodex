@@ -1,0 +1,13 @@
+[package]
+name = "ccodex-compat"
+description = "Compatibility adapters for foreign agent ecosystems"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+ccodex-brand.workspace = true
+ccodex-protocol.workspace = true
+thiserror.workspace = true

@@ -1,0 +1,17 @@
+[package]
+name = "ccodex-testkit"
+description = "Testing and parity harness utilities for ccodex"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+ccodex-kernel.workspace = true
+ccodex-protocol.workspace = true
+ccodex-runtime.workspace = true
+ccodex-store.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
