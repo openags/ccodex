@@ -10,4 +10,7 @@ repository.workspace = true
 [dependencies]
 ccodex-brand.workspace = true
 ccodex-protocol.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 thiserror.workspace = true
+toml.workspace = true

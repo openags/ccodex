@@ -5,8 +5,8 @@ use rusqlite::Connection;
 
 use ccodex_protocol::{Item, Session, SessionId, Turn, TurnId};
 
-use crate::sqlite::{items, sessions, turns};
 use crate::sqlite::migrations::MIGRATIONS;
+use crate::sqlite::{items, sessions, turns};
 use crate::traits::{ListSessionsParams, SessionStore, StoreError, StoredTurn};
 
 #[derive(Debug, Clone)]
@@ -16,7 +16,9 @@ pub struct SQLiteSessionStore {
 
 impl SQLiteSessionStore {
     pub fn new(db_path: impl Into<PathBuf>) -> Result<Self, StoreError> {
-        let store = Self { db_path: db_path.into() };
+        let store = Self {
+            db_path: db_path.into(),
+        };
         store.initialize()?;
         Ok(store)
     }
@@ -95,7 +97,9 @@ impl SessionStore for SQLiteSessionStore {
 mod tests {
     use std::collections::BTreeMap;
 
-    use ccodex_protocol::{Item, ItemId, ItemPayload, Session, SessionId, SessionStatus, Turn, TurnId, TurnStatus};
+    use ccodex_protocol::{
+        Item, ItemId, ItemPayload, Session, SessionId, SessionStatus, Turn, TurnId, TurnStatus,
+    };
     use time::OffsetDateTime;
 
     use super::*;
@@ -119,7 +123,10 @@ mod tests {
             active_plan: None,
             metadata: BTreeMap::new(),
         };
-        store.create_session(&session).await.expect("session should persist");
+        store
+            .create_session(&session)
+            .await
+            .expect("session should persist");
 
         let turn = Turn {
             id: TurnId::new(),
@@ -141,7 +148,10 @@ mod tests {
         };
         store.append_item(&item).await.expect("item should persist");
 
-        let stored_session = store.get_session(&session.id).await.expect("session should load");
+        let stored_session = store
+            .get_session(&session.id)
+            .await
+            .expect("session should load");
         let stored_turn = store.get_turn(&turn.id).await.expect("turn should load");
 
         assert_eq!(stored_session.id, session.id);

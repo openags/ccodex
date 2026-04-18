@@ -2,19 +2,45 @@
 
 mod approval;
 mod config;
+mod config_env;
+mod config_parse;
+mod fs;
+mod mcp;
+mod permissions;
 mod provider;
+mod provider_bootstrap;
+mod provider_parse;
+mod sandbox;
+mod shell;
 mod tools;
 
-pub use approval::{AutoApproveEngine, StaticAskUserEngine};
-pub use config::{ApprovalPolicy, RuntimeConfig};
-pub use provider::{BootstrapModelProvider, EchoModelProvider};
+pub use approval::{AutoApproveEngine, StaticAskUserEngine, enrich_approval_request};
+pub use config::{
+    ApprovalPolicy, ApprovalRules, ProviderConfig, ProviderKind, RuntimeConfig, RuntimeConfigError,
+};
+pub use fs::WorkspaceFs;
+pub use mcp::{CommandBackedMcpPort, McpServerDefinition};
+pub use permissions::{ApprovalAssessment, CommandRisk, analyze_tool_call};
+pub use provider::{
+    AnthropicCompatibleProvider, EchoModelProvider, OpenAiCompatibleProvider, provider_from_config,
+};
+pub use provider_bootstrap::BootstrapModelProvider;
+pub use sandbox::{
+    FileAccess, SandboxMode, SandboxPolicy, command_looks_dangerous, command_looks_mutating,
+    command_looks_scripted_execution, command_requests_network,
+    command_targets_sensitive_locations,
+};
+pub use shell::{ShellOutput, WorkspaceShell};
 pub use tools::{BuiltinToolExecutor, ToolRegistry};
 
 use std::sync::Arc;
+use std::{path::PathBuf, result::Result as StdResult};
 
 use async_trait::async_trait;
 
-use ccodex_protocol::{ApprovalEnginePort, NotificationPort, PortError, ProtocolEvent, ToolExecutorPort, ToolSpec};
+use ccodex_protocol::{
+    ApprovalEnginePort, NotificationPort, PortError, ProtocolEvent, ToolExecutorPort, ToolSpec,
+};
 
 #[derive(Default)]
 pub struct NoopNotificationPort;
@@ -56,13 +82,42 @@ impl Runtime {
     }
 
     pub fn bootstrap() -> Self {
-        let config = RuntimeConfig::default();
+        let config = RuntimeConfig {
+            provider: ProviderConfig {
+                kind: ProviderKind::Bootstrap,
+                base_url: None,
+                api_key: None,
+                model: ccodex_brand::DEFAULT_MODEL.to_string(),
+                max_output_tokens: 16_000,
+            },
+            // Use AlwaysApprove for bootstrap mode to enable automated testing
+            approval_policy: ApprovalPolicy::AlwaysApprove,
+            ..RuntimeConfig::default()
+        };
+        Self::from_config(config)
+    }
+
+    pub fn from_env() -> Self {
+        Self::from_config(RuntimeConfig::from_env())
+    }
+
+    pub fn for_workspace(workspace_root: PathBuf) -> StdResult<Self, config::RuntimeConfigError> {
+        Ok(Self::from_config(RuntimeConfig::load_for_workspace(
+            workspace_root,
+        )?))
+    }
+
+    pub fn from_config(config: RuntimeConfig) -> Self {
         let tool_registry = ToolRegistry::bootstrap_builtin();
-        let provider = Arc::new(BootstrapModelProvider::default());
+        let provider = Arc::from(provider_from_config(&config.provider));
         let notifications = Arc::new(NoopNotificationPort);
-        let approval_engine = Arc::new(AutoApproveEngine::new(config.approval_policy.clone()));
+        let approval_engine = Arc::new(AutoApproveEngine::new(
+            config.approval_policy.clone(),
+            config.approval_rules.clone(),
+        ));
         let tool_executor = Arc::new(BuiltinToolExecutor::new(
             config.workspace_root.clone(),
+            config.sandbox_mode.clone(),
             tool_registry.clone(),
         ));
 
@@ -77,24 +132,17 @@ impl Runtime {
     }
 
     pub fn echo() -> Self {
-        let config = RuntimeConfig::default();
-        let tool_registry = ToolRegistry::bootstrap_builtin();
-        let provider = Arc::new(EchoModelProvider::default());
-        let notifications = Arc::new(NoopNotificationPort);
-        let approval_engine = Arc::new(AutoApproveEngine::new(config.approval_policy.clone()));
-        let tool_executor = Arc::new(BuiltinToolExecutor::new(
-            config.workspace_root.clone(),
-            tool_registry.clone(),
-        ));
-
-        Self::new(
-            config,
-            provider,
-            notifications,
-            approval_engine,
-            tool_executor,
-            tool_registry,
-        )
+        let config = RuntimeConfig {
+            provider: ProviderConfig {
+                kind: ProviderKind::Echo,
+                base_url: None,
+                api_key: None,
+                model: "echo".to_string(),
+                max_output_tokens: 16_000,
+            },
+            ..RuntimeConfig::default()
+        };
+        Self::from_config(config)
     }
 
     pub fn config(&self) -> &RuntimeConfig {
@@ -128,6 +176,6 @@ impl Runtime {
 
 impl Default for Runtime {
     fn default() -> Self {
-        Self::bootstrap()
+        Self::from_env()
     }
 }

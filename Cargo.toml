@@ -4,6 +4,7 @@ members = [
     "apps/cli",
     "apps/tui",
     "apps/local-server",
+    "apps/desktop/src-tauri",
     "modules/brand",
     "modules/protocol",
     "modules/kernel",
@@ -28,18 +29,22 @@ clap = { version = "4", features = ["derive", "env"] }
 crossterm = "0.28"
 dirs = "6"
 futures = "0.3"
+glob = "0.3"
 pretty_assertions = "1"
 ratatui = "0.29"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 rusqlite = { version = "0.32", features = ["bundled", "time"] }
 schemars = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 time = { version = "0.3", features = ["formatting", "macros", "parsing", "serde"] }
 tokio = { version = "1", features = ["full"] }
+tokio-tungstenite = "0.24"
 toml = "0.8"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 thiserror = "2"
+tungstenite = "0.24"
 ulid = { version = "1", features = ["serde"] }
 
 ccodex-brand = { path = "modules/brand" }

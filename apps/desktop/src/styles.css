@@ -1,0 +1,162 @@
+:root {
+  color-scheme: light;
+  font-family: "IBM Plex Sans", "Helvetica Neue", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(214, 233, 255, 0.85), transparent 30%),
+    linear-gradient(135deg, #f7f4ed, #ecf1f8 55%, #eef6ea);
+  color: #162033;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+.shell {
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.topbar {
+  margin-bottom: 16px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.topbar p {
+  margin: 6px 0 0;
+  color: #41506b;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+}
+
+.sidebar,
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel {
+  border: 1px solid rgba(40, 63, 95, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  padding: 16px;
+  box-shadow: 0 8px 30px rgba(24, 38, 68, 0.08);
+}
+
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #50617f;
+}
+
+.panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.panel button {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #e8eef9;
+  color: #11233f;
+  cursor: pointer;
+}
+
+.panel button.active {
+  background: #11233f;
+  color: white;
+}
+
+.panel small {
+  color: #62738f;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+}
+
+.button-row.wrap {
+  flex-wrap: wrap;
+}
+
+.transcript {
+  flex: 1;
+  min-height: 420px;
+}
+
+.transcript pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.composer textarea {
+  min-height: 120px;
+  resize: vertical;
+  border: 1px solid rgba(40, 63, 95, 0.16);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.composer button {
+  align-self: flex-end;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 0;
+  background: #123a7a;
+  color: white;
+  cursor: pointer;
+}
+
+@media (max-width: 960px) {
+  .shell {
+    padding: 14px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

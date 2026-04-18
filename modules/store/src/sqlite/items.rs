@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use serde_json::{from_str, to_string};
 
 use ccodex_protocol::{Item, TurnId};
@@ -6,7 +6,8 @@ use ccodex_protocol::{Item, TurnId};
 use crate::traits::StoreError;
 
 pub fn upsert_item(connection: &Connection, item: &Item) -> Result<(), StoreError> {
-    let payload_json = to_string(&item.payload).map_err(|err| StoreError::Serialization(err.to_string()))?;
+    let payload_json =
+        to_string(&item.payload).map_err(|err| StoreError::Serialization(err.to_string()))?;
     let created_at = item
         .created_at
         .format(&time::format_description::well_known::Rfc3339)
@@ -28,7 +29,10 @@ pub fn upsert_item(connection: &Connection, item: &Item) -> Result<(), StoreErro
     Ok(())
 }
 
-pub fn list_items_for_turn(connection: &Connection, turn_id: &TurnId) -> Result<Vec<Item>, StoreError> {
+pub fn list_items_for_turn(
+    connection: &Connection,
+    turn_id: &TurnId,
+) -> Result<Vec<Item>, StoreError> {
     let mut statement = connection
         .prepare("SELECT id, turn_id, created_at, payload_json FROM items WHERE turn_id = ?1 ORDER BY created_at ASC")
         .map_err(|err| StoreError::Database(err.to_string()))?;
@@ -40,10 +44,24 @@ pub fn list_items_for_turn(connection: &Connection, turn_id: &TurnId) -> Result<
             Ok(Item {
                 id: ccodex_protocol::ItemId(row.get::<_, String>(0)?),
                 turn_id: ccodex_protocol::TurnId(row.get::<_, String>(1)?),
-                created_at: time::OffsetDateTime::parse(&created_at, &time::format_description::well_known::Rfc3339)
-                    .map_err(|err| rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(err)))?,
-                payload: from_str(&payload_json)
-                    .map_err(|err| rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(err)))?,
+                created_at: time::OffsetDateTime::parse(
+                    &created_at,
+                    &time::format_description::well_known::Rfc3339,
+                )
+                .map_err(|err| {
+                    rusqlite::Error::FromSqlConversionFailure(
+                        0,
+                        rusqlite::types::Type::Text,
+                        Box::new(err),
+                    )
+                })?,
+                payload: from_str(&payload_json).map_err(|err| {
+                    rusqlite::Error::FromSqlConversionFailure(
+                        0,
+                        rusqlite::types::Type::Text,
+                        Box::new(err),
+                    )
+                })?,
             })
         })
         .map_err(|err| StoreError::Database(err.to_string()))?

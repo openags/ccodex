@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use serde_json::{from_str, to_string};
 
 use ccodex_protocol::{Session, SessionId, SessionStatus};
@@ -12,7 +12,8 @@ pub fn upsert_session(connection: &Connection, session: &Session) -> Result<(), 
         .map(to_string)
         .transpose()
         .map_err(|err| StoreError::Serialization(err.to_string()))?;
-    let metadata_json = to_string(&session.metadata).map_err(|err| StoreError::Serialization(err.to_string()))?;
+    let metadata_json =
+        to_string(&session.metadata).map_err(|err| StoreError::Serialization(err.to_string()))?;
 
     connection
         .execute(
@@ -66,10 +67,28 @@ pub fn get_session(connection: &Connection, session_id: &SessionId) -> Result<Se
                 id: SessionId(row.get::<_, String>(0)?),
                 title: row.get(1)?,
                 workspace_root: row.get::<_, Option<String>>(2)?.map(Into::into),
-                created_at: time::OffsetDateTime::parse(&created_at, &time::format_description::well_known::Rfc3339)
-                    .map_err(|err| rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(err)))?,
-                updated_at: time::OffsetDateTime::parse(&updated_at, &time::format_description::well_known::Rfc3339)
-                    .map_err(|err| rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(err)))?,
+                created_at: time::OffsetDateTime::parse(
+                    &created_at,
+                    &time::format_description::well_known::Rfc3339,
+                )
+                .map_err(|err| {
+                    rusqlite::Error::FromSqlConversionFailure(
+                        0,
+                        rusqlite::types::Type::Text,
+                        Box::new(err),
+                    )
+                })?,
+                updated_at: time::OffsetDateTime::parse(
+                    &updated_at,
+                    &time::format_description::well_known::Rfc3339,
+                )
+                .map_err(|err| {
+                    rusqlite::Error::FromSqlConversionFailure(
+                        0,
+                        rusqlite::types::Type::Text,
+                        Box::new(err),
+                    )
+                })?,
                 status: match row.get::<_, String>(5)?.as_str() {
                     "archived" => SessionStatus::Archived,
                     _ => SessionStatus::Active,
@@ -77,9 +96,20 @@ pub fn get_session(connection: &Connection, session_id: &SessionId) -> Result<Se
                 active_plan: active_plan_json
                     .map(|json| from_str(&json))
                     .transpose()
-                    .map_err(|err| rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(err)))?,
-                metadata: from_str(&metadata_json)
-                    .map_err(|err| rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(err)))?,
+                    .map_err(|err| {
+                        rusqlite::Error::FromSqlConversionFailure(
+                            0,
+                            rusqlite::types::Type::Text,
+                            Box::new(err),
+                        )
+                    })?,
+                metadata: from_str(&metadata_json).map_err(|err| {
+                    rusqlite::Error::FromSqlConversionFailure(
+                        0,
+                        rusqlite::types::Type::Text,
+                        Box::new(err),
+                    )
+                })?,
             })
         })
         .map_err(|err| match err {
@@ -88,12 +118,13 @@ pub fn get_session(connection: &Connection, session_id: &SessionId) -> Result<Se
         })
 }
 
-pub fn list_sessions(connection: &Connection, params_cfg: ListSessionsParams) -> Result<Vec<Session>, StoreError> {
+pub fn list_sessions(
+    connection: &Connection,
+    params_cfg: ListSessionsParams,
+) -> Result<Vec<Session>, StoreError> {
     let limit = params_cfg.limit.unwrap_or(100) as i64;
     let mut statement = connection
-        .prepare(
-            "SELECT id FROM sessions ORDER BY updated_at DESC LIMIT ?1",
-        )
+        .prepare("SELECT id FROM sessions ORDER BY updated_at DESC LIMIT ?1")
         .map_err(|err| StoreError::Database(err.to_string()))?;
 
     let ids = statement

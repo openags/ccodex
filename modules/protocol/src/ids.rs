@@ -6,7 +6,9 @@ use ulid::Ulid;
 
 macro_rules! id_type {
     ($name:ident) => {
-        #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema)]
+        #[derive(
+            Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema,
+        )]
         #[serde(transparent)]
         pub struct $name(pub String);
 

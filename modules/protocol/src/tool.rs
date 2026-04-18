@@ -42,3 +42,9 @@ pub struct ToolResult {
     pub output: Value,
     pub is_error: bool,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+pub struct ToolExecutionOutcome {
+    pub result: ToolResult,
+    pub deltas: Vec<Value>,
+}

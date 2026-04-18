@@ -2,7 +2,7 @@ use async_trait::async_trait;
 
 use ccodex_protocol::{SessionId, Turn};
 
-use crate::{traits::StoreError, MemoryProvider};
+use crate::{MemoryProvider, traits::StoreError};
 
 #[derive(Debug, Clone, Default)]
 pub struct NoopMemoryProvider;
@@ -13,7 +13,11 @@ impl MemoryProvider for NoopMemoryProvider {
         Ok(())
     }
 
-    async fn recall_context(&self, _session_id: &SessionId, _turn: &Turn) -> Result<Option<String>, StoreError> {
+    async fn recall_context(
+        &self,
+        _session_id: &SessionId,
+        _turn: &Turn,
+    ) -> Result<Option<String>, StoreError> {
         Ok(None)
     }
 

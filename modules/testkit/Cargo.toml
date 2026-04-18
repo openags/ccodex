@@ -8,10 +8,12 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+ccodex-brand.workspace = true
 ccodex-kernel.workspace = true
 ccodex-protocol.workspace = true
 ccodex-runtime.workspace = true
 ccodex-store.workspace = true
 
 [dev-dependencies]
+serde_json.workspace = true
 tokio.workspace = true

@@ -3,7 +3,10 @@ use serde_json::to_string;
 
 use ccodex_protocol::SessionId;
 
-use crate::{traits::{SessionStore, StoreError}, TranscriptExporter};
+use crate::{
+    TranscriptExporter,
+    traits::{SessionStore, StoreError},
+};
 
 #[derive(Debug, Clone)]
 pub struct JsonlTranscriptExporter {

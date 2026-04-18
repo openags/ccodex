@@ -4,7 +4,8 @@ use serde_json::Value;
 use time::OffsetDateTime;
 
 use crate::{
-    ApprovalRequest, ApprovalResponse, AskUserPrompt, AskUserResponse, ItemId, PlanState, ToolCall, ToolResult,
+    ApprovalRequest, ApprovalResponse, AskUserPrompt, AskUserResponse, ItemId, PlanState, ToolCall,
+    ToolResult,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

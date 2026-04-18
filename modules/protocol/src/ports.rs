@@ -5,7 +5,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use thiserror::Error;
 
-use crate::{ApprovalRequest, AskUserPrompt, ProtocolEvent, Session, ToolCall, ToolResult, Turn};
+use crate::{
+    ApprovalRequest, AskUserPrompt, Item, ProtocolEvent, Session, ToolCall, ToolExecutionOutcome,
+    Turn,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct TurnRequest {
@@ -13,6 +16,7 @@ pub struct TurnRequest {
     pub turn: Turn,
     pub instructions: String,
     pub project_instructions: Vec<String>,
+    pub items: Vec<Item>,
     pub available_tools: Vec<crate::ToolSpec>,
 }
 
@@ -42,18 +46,27 @@ pub enum PortError {
 
 #[async_trait]
 pub trait ModelProviderPort: Send + Sync {
-    async fn start_turn(&self, request: TurnRequest) -> Result<BoxStream<'static, Result<ProviderEvent, PortError>>, PortError>;
+    async fn start_turn(
+        &self,
+        request: TurnRequest,
+    ) -> Result<BoxStream<'static, Result<ProviderEvent, PortError>>, PortError>;
 }
 
 #[async_trait]
 pub trait ToolExecutorPort: Send + Sync {
-    async fn execute_tool(&self, call: ToolCall) -> Result<ToolResult, PortError>;
+    async fn execute_tool(&self, call: ToolCall) -> Result<ToolExecutionOutcome, PortError>;
 }
 
 #[async_trait]
 pub trait ApprovalEnginePort: Send + Sync {
-    async fn request_approval(&self, request: ApprovalRequest) -> Result<crate::ApprovalResponse, PortError>;
-    async fn request_user_input(&self, prompt: AskUserPrompt) -> Result<crate::AskUserResponse, PortError>;
+    async fn request_approval(
+        &self,
+        request: ApprovalRequest,
+    ) -> Result<crate::ApprovalResponse, PortError>;
+    async fn request_user_input(
+        &self,
+        prompt: AskUserPrompt,
+    ) -> Result<crate::AskUserResponse, PortError>;
 }
 
 #[async_trait]

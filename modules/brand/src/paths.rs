@@ -3,8 +3,8 @@
 use std::path::{Path, PathBuf};
 
 use crate::naming::{
-    CONFIG_FILE_NAME, EXPORTS_DIR_NAME, PROJECT_DIR_NAME, PROJECT_INSTRUCTIONS_FILE, STATE_DB_FILE_NAME,
-    USER_DIR_NAME,
+    CONFIG_FILE_NAME, EXPORTS_DIR_NAME, PROJECT_DIR_NAME, PROJECT_INSTRUCTIONS_FILE,
+    STATE_DB_FILE_NAME, USER_DIR_NAME,
 };
 
 /// Returns the canonical user home directory for ccodex.

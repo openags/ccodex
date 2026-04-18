@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use serde_json::{from_str, to_string};
 
 use ccodex_protocol::{Turn, TurnId, TurnStatus};
@@ -6,7 +6,8 @@ use ccodex_protocol::{Turn, TurnId, TurnStatus};
 use crate::traits::StoreError;
 
 pub fn upsert_turn(connection: &Connection, turn: &Turn) -> Result<(), StoreError> {
-    let item_ids_json = to_string(&turn.item_ids).map_err(|err| StoreError::Serialization(err.to_string()))?;
+    let item_ids_json =
+        to_string(&turn.item_ids).map_err(|err| StoreError::Serialization(err.to_string()))?;
     let started_at = turn
         .started_at
         .format(&time::format_description::well_known::Rfc3339)
@@ -60,14 +61,39 @@ pub fn get_turn(connection: &Connection, turn_id: &TurnId) -> Result<Turn, Store
             Ok(Turn {
                 id: TurnId(row.get::<_, String>(0)?),
                 session_id: ccodex_protocol::SessionId(row.get::<_, String>(1)?),
-                item_ids: from_str(&item_ids_json)
-                    .map_err(|err| rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(err)))?,
-                started_at: time::OffsetDateTime::parse(&started_at, &time::format_description::well_known::Rfc3339)
-                    .map_err(|err| rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(err)))?,
+                item_ids: from_str(&item_ids_json).map_err(|err| {
+                    rusqlite::Error::FromSqlConversionFailure(
+                        0,
+                        rusqlite::types::Type::Text,
+                        Box::new(err),
+                    )
+                })?,
+                started_at: time::OffsetDateTime::parse(
+                    &started_at,
+                    &time::format_description::well_known::Rfc3339,
+                )
+                .map_err(|err| {
+                    rusqlite::Error::FromSqlConversionFailure(
+                        0,
+                        rusqlite::types::Type::Text,
+                        Box::new(err),
+                    )
+                })?,
                 completed_at: completed_at
-                    .map(|value| time::OffsetDateTime::parse(&value, &time::format_description::well_known::Rfc3339))
+                    .map(|value| {
+                        time::OffsetDateTime::parse(
+                            &value,
+                            &time::format_description::well_known::Rfc3339,
+                        )
+                    })
                     .transpose()
-                    .map_err(|err| rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(err)))?,
+                    .map_err(|err| {
+                        rusqlite::Error::FromSqlConversionFailure(
+                            0,
+                            rusqlite::types::Type::Text,
+                            Box::new(err),
+                        )
+                    })?,
                 status: match row.get::<_, String>(5)?.as_str() {
                     "completed" => TurnStatus::Completed,
                     "failed" => TurnStatus::Failed,

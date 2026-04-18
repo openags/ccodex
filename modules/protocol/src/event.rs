@@ -20,7 +20,9 @@ impl ProtocolEvent {
     pub fn session_id(&self) -> Option<&SessionId> {
         match self {
             Self::SessionCreated(session) | Self::SessionUpdated(session) => Some(&session.id),
-            Self::TurnStarted(turn) | Self::TurnUpdated(turn) | Self::TurnFinished(turn) => Some(&turn.session_id),
+            Self::TurnStarted(turn) | Self::TurnUpdated(turn) | Self::TurnFinished(turn) => {
+                Some(&turn.session_id)
+            }
             Self::ItemAppended(item) => {
                 let _ = item;
                 None
@@ -32,7 +34,9 @@ impl ProtocolEvent {
 
     pub fn turn_id(&self) -> Option<&TurnId> {
         match self {
-            Self::TurnStarted(turn) | Self::TurnUpdated(turn) | Self::TurnFinished(turn) => Some(&turn.id),
+            Self::TurnStarted(turn) | Self::TurnUpdated(turn) | Self::TurnFinished(turn) => {
+                Some(&turn.id)
+            }
             _ => None,
         }
     }
